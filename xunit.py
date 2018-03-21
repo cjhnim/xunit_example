@@ -17,10 +17,10 @@ class TestCase:
 
 class WasRun(TestCase):
     def setUp(self):
-        self.wasRun= None
+        self.WasRun= None
         self.log="setUp "
     def testMethod(self):
-        self.wasRun =1
+        self.WasRun =1
         self.log=self.log + "testMethod "
     def testBrokenMethod(self):
         raise Exception
@@ -39,10 +39,18 @@ class TestResult:
         return "%d run, %d failed" % (self.runCount, self.failureCount)
 
 class TestSuite:
-    def __init__(self):
+    def __init__(self, testClass=None):
         self.tests= []
+        if(testClass != None):
+            self.addTests(testClass)
     def add(self, test):
         self.tests.append(test)
+    def addTests(self, testClass):
+        testMethods=self.listTestMethod(testClass)
+        for testcase in testMethods:
+            self.add(testClass(testcase))
+    def listTestMethod(self, className):
+        return [func for func in dir(className) if callable(getattr(className, func)) and not func.startswith("__") and func.startswith("test")]
     def run(self, result):
         for test in self.tests:
             test.run(result)
@@ -75,13 +83,19 @@ class TestCaseTest(TestCase):
         suite.add(WasRun("testBrokenMethod"))
         suite.run(self.result)
         assert("2 run, 1 failed" == self.result.summary())
+    def testListTestMethod(self):
+        method_list = TestSuite().listTestMethod(WasRun)
+        actual_list= ""
+        for method in method_list:
+            actual_list += method + ","
+        print actual_list
+        assert("testBrokenMethod,testMethod," ==  actual_list)
+    def testAutoSuite(self):
+        suite= TestSuite(WasRun)
+        suite.run(self.result)
+        assert("2 run, 1 failed" == self.result.summary())
    
-suite = TestSuite()
-suite.add(TestCaseTest("testTemplateMethod"))
-suite.add(TestCaseTest("testResult"))
-suite.add(TestCaseTest("testFailedResultFormatting"))
-suite.add(TestCaseTest("testFailedResult"))
-suite.add(TestCaseTest("testSuite"))
+suite = TestSuite(TestCaseTest)
 result= TestResult()
 suite.run(result)
 print result.summary()
