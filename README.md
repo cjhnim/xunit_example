@@ -3,12 +3,12 @@
 - [x] 테스트 메서드 호출하기
 - [x] 먼저 setUp 호출하기
 - [x] 나중에 tearDown 호출하기
-- [ ] 테스트 메서드가 실패하더라도 tearDown 호출하기
+- [x] 테스트 메서드가 실패하더라도 tearDown 호출하기 <2018.3.22 완료>
 - [x] 테스트 여러 개 실행하기
 - [x] 수집한 결과를 출력하기
 - [x] WasRun에 로그 문자열 남기기
 - [x] 실패한 테스트 보고하기
-- [ ] setUp 에러를 잡아서 보고하기
+- [ ] setUp 에러를 잡아서 보고하기 
 - [x] TestCase 클래스에서 TestSuite 생성하기 <2018.3.21 완료>
 
 ## 2018.3.20 작성
@@ -52,3 +52,13 @@ class TestSuite:
         return [func for func in dir(className) if callable(getattr(className, func)) and not func.startswith("__") and func.startswith("test")]
   ```
 파이썬은 조금 생소하긴한데 Kent Beck 아저씨 말대로 xUnit을 만들어가면서 언어적특징을 배워가는 맛도 있긴 하네요!
+  
+## 2018.3.21 작성
+잠자기전에 조금 작업해보았습니다. 작업한 것은 setUp이 실패하더라도 tearDown이 호출되게 하는 것입니다. 단순히 try 구문안으로 setUp을 포함시키는 것으로 간단히 해결하였습니다.  
+그리고 기존의 WasRun대신에 setUp이 실패할 테스트가 필요하여서 WasRunBroken을 생성하였습니다.
+```python
+    def testTearDownShouldCalledEvenIfSetupFailed(self):
+        test= WasRunBroken("testMethod")
+        test.run(self.result)
+        assert("setUp tearDown " == test.log)
+```
