@@ -17,10 +17,8 @@ class TestCase:
 
 class WasRun(TestCase):
     def setUp(self):
-        self.WasRun= None
         self.log="setUp "
     def testMethod(self):
-        self.WasRun =1
         self.log=self.log + "testMethod "
     def testBrokenMethod(self):
         raise Exception
@@ -41,9 +39,9 @@ class TestResult:
         self.runCount= 0
         self.failureCount= 0
     def testStarted(self):
-        self.runCount=self.runCount+1
+        self.runCount+=1
     def testFailed(self):
-        self.failureCount= self.failureCount + 1
+        self.failureCount+= 1
     def summary(self):
         return "%d run, %d failed" % (self.runCount, self.failureCount)
 
@@ -83,9 +81,10 @@ class TestCaseTest(TestCase):
         test.run(self.result)
         assert("1 run, 1 failed" == self.result.summary())
     def testFailedResultFormatting(self):
+        result = TestResult()
         result.testStarted()
         result.testFailed()
-        assert("1 run, 1 failed" == self.result.summary())
+        assert("1 run, 1 failed" == result.summary())
     def testSuite(self):
         suite= TestSuite()
         suite.add(WasRun("testMethod"))
