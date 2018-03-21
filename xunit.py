@@ -5,8 +5,8 @@ class TestCase:
         pass
     def run(self, result):
         result.testStarted()
-        self.setUp()
         try:
+            self.setUp()
             method= getattr(self, self.name)
             method()
         except:
@@ -24,6 +24,15 @@ class WasRun(TestCase):
         self.log=self.log + "testMethod "
     def testBrokenMethod(self):
         raise Exception
+    def tearDown(self):
+        self.log=self.log + "tearDown "
+
+class WasRunBroken(TestCase):
+    def setUp(self):
+        self.log="setUp "
+        raise Exception
+    def testMethod(self):
+        self.log=self.log + "testMethod "
     def tearDown(self):
         self.log=self.log + "tearDown "
 
@@ -57,7 +66,7 @@ class TestSuite:
 
 class TestCaseTest(TestCase):
     def __init__(self, name):
-        print("TESTCASE: "+name)
+        print("TESTCASE: "+name)        
         TestCase.__init__(self,name)
     def setUp(self):
         self.result= TestResult()
@@ -88,12 +97,15 @@ class TestCaseTest(TestCase):
         actual_list= ""
         for method in method_list:
             actual_list += method + ","
-        print actual_list
         assert("testBrokenMethod,testMethod," ==  actual_list)
     def testAutoSuite(self):
         suite= TestSuite(WasRun)
         suite.run(self.result)
         assert("2 run, 1 failed" == self.result.summary())
+    def testTearDownShouldCalledEvenIfSetupFailed(self):
+        test= WasRunBroken("testMethod")
+        test.run(self.result)
+        assert("setUp tearDown " == test.log)
    
 suite = TestSuite(TestCaseTest)
 result= TestResult()
