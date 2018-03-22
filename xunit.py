@@ -61,7 +61,7 @@ class WasRunBroken(WasRun):
 
 class TestCaseTest(TestCase):
     def __init__(self, name):
-        print("TESTCASE: "+name)        
+        print("TestCaseTest: "+name)        
         TestCase.__init__(self,name)
     def setUp(self):
         self.result= TestResult()
@@ -102,6 +102,10 @@ class TestCaseTest(TestCase):
         test= WasRunBroken("testMethod")
         test.run(self.result)
         assert("WasRunBroken:setUp tearDown " == test.log)
+    def testFailedResultEvenIfSetupFailed(self):
+        suite= TestSuite(WasRunBroken)
+        suite.run(self.result)
+        assert("2 run, 2 failed" == self.result.summary())
    
 suite = TestSuite(TestCaseTest)
 result= TestResult()
