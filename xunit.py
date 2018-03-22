@@ -11,28 +11,10 @@ class TestCase:
             method()
         except:
             result.testFailed()
-        self.tearDown()
+        finally:
+            self.tearDown()
     def tearDown(self):
         pass
-
-class WasRun(TestCase):
-    def setUp(self):
-        self.log="setUp "
-    def testMethod(self):
-        self.log=self.log + "testMethod "
-    def testBrokenMethod(self):
-        raise Exception
-    def tearDown(self):
-        self.log=self.log + "tearDown "
-
-class WasRunBroken(TestCase):
-    def setUp(self):
-        self.log="setUp "
-        raise Exception
-    def testMethod(self):
-        self.log=self.log + "testMethod "
-    def tearDown(self):
-        self.log=self.log + "tearDown "
 
 class TestResult:
     def __init__(self):
@@ -57,10 +39,25 @@ class TestSuite:
         for testcase in testMethods:
             self.add(testClass(testcase))
     def listTestMethod(self, className):
-        return [func for func in dir(className) if callable(getattr(className, func)) and not func.startswith("__") and func.startswith("test")]
+        return [func for func in dir(className) if callable(getattr(className, func)) and func.startswith("test")]
     def run(self, result):
         for test in self.tests:
             test.run(result)
+
+class WasRun(TestCase):
+    def setUp(self):
+        self.log="setUp "
+    def testMethod(self):
+        self.log=self.log + "testMethod "
+    def testBrokenMethod(self):
+        raise Exception
+    def tearDown(self):
+        self.log=self.log + "tearDown "
+
+class WasRunBroken(WasRun):
+    def setUp(self):
+        self.log="WasRunBroken:setUp "
+        raise Exception
 
 class TestCaseTest(TestCase):
     def __init__(self, name):
@@ -104,7 +101,7 @@ class TestCaseTest(TestCase):
     def testTearDownShouldCalledEvenIfSetupFailed(self):
         test= WasRunBroken("testMethod")
         test.run(self.result)
-        assert("setUp tearDown " == test.log)
+        assert("WasRunBroken:setUp tearDown " == test.log)
    
 suite = TestSuite(TestCaseTest)
 result= TestResult()
