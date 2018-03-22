@@ -1,6 +1,6 @@
 class TestCase:
     def __init__(self, name):
-        self.name= name
+        self.name = name
     def setUp(self):
         pass
     def run(self, result):
@@ -110,6 +110,6 @@ class TestCaseTest(TestCase):
 suite = TestSuite(TestCaseTest)
 result= TestResult()
 suite.run(result)
-print result.summary()
+print(result.summary())
 
 
